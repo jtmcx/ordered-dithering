@@ -86,6 +86,13 @@ writepixel(FILE *out, Pixel p)
 	fwrite(&p, 1, 8, out);
 }
 
+static uint16_t
+quantize(uint16_t x)
+{
+	uint16_t v = (x >> 12) & 0xE;
+	return (v << 0) | (v << 4) | (v << 8) | (v << 12);
+}
+
 static Pixel 
 togreyscale(Pixel p, uint32_t row, uint32_t col)
 {
@@ -96,12 +103,13 @@ togreyscale(Pixel p, uint32_t row, uint32_t col)
 	m += 0.21 * p.r;
 	m += 0.72 * p.g;
 	m += 0.07 * p.b;
+	m = quantize(m);
 
 	/* Get the threshold from the bayer matrix. */
 	thresh = bayer[(row % DIM) * DIM + (col % DIM)];
 
 	/* Only enable the pixel if we're passed the threshold. */
-	m = m > thresh ? 0xFFFF : 0;
+	m = m > thresh ? m : 0;
 
 	q.r = q.g = q.b = m;
 	q.a = 0xFFFF;		   /* Ignore alpha channel. */

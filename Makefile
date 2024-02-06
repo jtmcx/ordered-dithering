@@ -21,4 +21,4 @@ clean:
 	rm -f dither bayer *.o bayer.inc
 
 test: dither
-	cat obama.jpg | 2ff | ./$(TARG) | ff2jpg | feh -
+	cat example/input.png | 2ff | ./$(TARG) | ff2png | feh -
